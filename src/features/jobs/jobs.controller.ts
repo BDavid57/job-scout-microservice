@@ -18,16 +18,6 @@ export class JobsController {
     return this.jobsService.findAll(query);
   }
 
-  @Post('countries')
-  syncCountries() {
-    return this.jobsService.syncCountries()
-  }
-
-  @Post('regions')
-  syncRegions() {
-    return this.jobsService.syncRegions()
-  }
-
   @Get(':id')
   getJob(@Param('id', ParseIntPipe) id: number) {
     return this.jobsService.findOne(id);
@@ -36,5 +26,15 @@ export class JobsController {
   @Post('sync')
   syncJobs(@Query() query: JobsQueryDto) {
     return this.jobsService.syncJobs(query);
+  }
+
+  @Post('regions')
+  syncRegions() {
+    return this.jobsService.syncRegions()
+  }
+
+  @Post('countries')
+  syncCountries() {
+    return this.jobsService.syncCountries()
   }
 }

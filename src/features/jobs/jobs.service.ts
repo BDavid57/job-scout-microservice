@@ -51,8 +51,14 @@ export class JobsService {
       for(const item of list) {
         const mapped = countryMapper.fromApi(item)
 
-        const regionEntity = this.countryRepo.create(mapped);
-        await this.countryRepo.save(regionEntity);
+        let country = await this.regionRepo.findOne({
+          where: { name: mapped.name },
+        });
+
+        if(!country) {
+          const regionEntity = this.countryRepo.create(mapped);
+          await this.countryRepo.save(regionEntity);
+        }
       }
 
       return list;
@@ -76,10 +82,16 @@ export class JobsService {
       );
 
       const list = response.data
-
+      
       for(const item of list) {
-        const regionEntity = this.regionRepo.create(item);
-        await this.regionRepo.save(regionEntity);
+        let region = await this.regionRepo.findOne({
+          where: { name: item.name },
+        });
+
+        if(!region) {
+          const regionEntity = this.regionRepo.create(item);
+          await this.regionRepo.save(regionEntity);
+        }
       }
 
       return list;
