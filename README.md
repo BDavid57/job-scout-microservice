@@ -23,39 +23,49 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This repository contains the **backend server** built with [NestJS](https://nestjs.com/) and TypeORM, using PostgreSQL as the database and Docker for containerization.
 
-## Project setup
+## 🚀 Features
 
-```bash
-$ yarn install
+- 🧱 Modular NestJS project structure
+- 🐳 Fully Dockerized setup
+- ⚡ TypeORM
+
+---
+
+## 📦 Tech Stack
+
+- **NestJS** – Scalable Node.js framework
+- **TypeORM** – Type-safe database ORM
+- **PostgreSQL** – Relational database
+- **Docker** – Containerized development
+
+---
+
+## 🔧 Getting Started
+
+### 🧪 Environment Variables
+
+Create a `.env` file with the following content:
+
+```env
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=mypassword
+POSTGRES_DB=lead_scout_db
+DB_HOST=db
+
+JOBDATA_API_KEY = b94a335d-a565-4a95-8853-70346c64fec9
 ```
 
-## Compile and run the project
+### Build & run with Docker
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+$ docker compose up -d --build
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
-```
+This will:
+1. start PostgreSQL,
+2. launch the NestJS API on http://localhost:3000.
 
 ## Deployment
 
