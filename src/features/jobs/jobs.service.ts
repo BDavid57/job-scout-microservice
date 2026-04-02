@@ -13,6 +13,8 @@ import { Company } from './entities/company.entity';
 import { JobsQueryDto } from './dto/jobs-query.dto';
 import { JobMapper } from './mappers/job.mapper';
 import { Region } from './entities/region.entity';
+import { Country } from './entities/country.entity';
+import { countryMapper } from './mappers/country.mapper';
 
 @Injectable()
 export class JobsService {
@@ -29,7 +31,39 @@ export class JobsService {
 
     @InjectRepository(Region)
     private readonly regionRepo: Repository<Region>,
+
+    @InjectRepository(Country)
+    private readonly countryRepo: Repository<Country>,
   ) {}
+
+  async syncCountries() {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.BASE_URL}jobcountries`, {
+          headers: {
+            Authorization: `Api-Key ${process.env.JOBDATA_API_KEY}`,
+          },
+        }),
+      );
+
+      const list = response.data
+
+      for(const item of list) {
+        const mapped = countryMapper.fromApi(item)
+
+        const regionEntity = this.countryRepo.create(mapped);
+        await this.countryRepo.save(regionEntity);
+      }
+
+      return list;
+    } catch (error: any) {
+      console.log(error.response.data.detail)
+      throw new HttpException(
+        'Failed to fetch jobs from external API',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   async syncRegions() {
     try {
@@ -49,7 +83,7 @@ export class JobsService {
       }
 
       return list;
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.response.data.detail)
       throw new HttpException(
         'Failed to fetch jobs from external API',
@@ -74,7 +108,7 @@ export class JobsService {
       );
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.response.data.detail)
       throw new HttpException(
         'Failed to fetch jobs from external API',

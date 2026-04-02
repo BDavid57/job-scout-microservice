@@ -18,6 +18,11 @@ export class JobsController {
     return this.jobsService.findAll(query);
   }
 
+  @Post('countries')
+  syncCountries() {
+    return this.jobsService.syncCountries()
+  }
+
   @Post('regions')
   syncRegions() {
     return this.jobsService.syncRegions()
