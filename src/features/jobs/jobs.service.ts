@@ -12,10 +12,11 @@ import { Job } from './entities/job.entity';
 import { Company } from './entities/company.entity';
 import { JobsQueryDto } from './dto/jobs-query.dto';
 import { JobMapper } from './mappers/job.mapper';
+import { Region } from './entities/region.entity';
 
 @Injectable()
 export class JobsService {
-  private readonly BASE_URL = 'https://jobdataapi.com/api/jobs/';
+  private readonly BASE_URL = 'https://jobdataapi.com/api/';
 
   constructor(
     private readonly httpService: HttpService,
@@ -25,12 +26,42 @@ export class JobsService {
 
     @InjectRepository(Company)
     private readonly companyRepo: Repository<Company>,
+
+    @InjectRepository(Region)
+    private readonly regionRepo: Repository<Region>,
   ) {}
+
+  async syncRegions() {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.BASE_URL}jobregions`, {
+          headers: {
+            Authorization: `Api-Key ${process.env.JOBDATA_API_KEY}`,
+          },
+        }),
+      );
+
+      const list = response.data
+
+      for(const item of list) {
+        const regionEntity = this.regionRepo.create(item);
+        await this.regionRepo.save(regionEntity);
+      }
+
+      return list;
+    } catch (error) {
+      console.log(error.response.data.detail)
+      throw new HttpException(
+        'Failed to fetch jobs from external API',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   async fetchFromApi(query: JobsQueryDto) {
     try {
       const response = await firstValueFrom(
-        this.httpService.get(this.BASE_URL, {
+        this.httpService.get(`${this.BASE_URL}jobs`, {
           headers: {
             Authorization: `Api-Key ${process.env.JOBDATA_API_KEY}`,
           },
@@ -55,7 +86,7 @@ export class JobsService {
   async syncJobs(query: JobsQueryDto) {
     const data = await this.fetchFromApi(query);
 
-    const list = data.results.slice(0, 200)
+    const list = data.results
 
     for (const apiJob of list) {
       const mapped = JobMapper.fromApi(apiJob);

@@ -18,6 +18,11 @@ export class JobsController {
     return this.jobsService.findAll(query);
   }
 
+  @Post('regions')
+  syncRegions() {
+    return this.jobsService.syncRegions()
+  }
+
   @Get(':id')
   getJob(@Param('id', ParseIntPipe) id: number) {
     return this.jobsService.findOne(id);
