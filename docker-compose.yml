@@ -6,9 +6,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: lead_scout_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
@@ -23,9 +23,6 @@ services:
     depends_on:
       - db
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: lead_scout_db
       DB_HOST: db
       CHOKIDAR_USEPOLLING: "true"
     volumes:
@@ -35,3 +32,4 @@ services:
 
 volumes:
   postgres_data:
+  

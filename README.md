@@ -21,47 +21,91 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# 🚀 Job Scout API (NestJS Backend)
 
-This repository contains the **backend server** built with [NestJS](https://nestjs.com/) and TypeORM, using PostgreSQL as the database and Docker for containerization.
-
-## 🚀 Features
-
-- 🧱 Modular NestJS project structure
-- 🐳 Fully Dockerized setup
-- ⚡ TypeORM
+A backend API built with **NestJS**, **TypeORM**, **PostgreSQL**, and **Docker**, designed for scalable job-related data processing and external API integrations.
 
 ---
 
-## 📦 Tech Stack
+## 🧱 Tech Stack
 
-- **NestJS** – Scalable Node.js framework
-- **TypeORM** – Type-safe database ORM
-- **PostgreSQL** – Relational database
-- **Docker** – Containerized development
+- ⚡ **NestJS** – Backend framework
+- 🗄️ **TypeORM** – ORM for PostgreSQL
+- 🐘 **PostgreSQL** – Relational database
+- 🐳 **Docker & Docker Compose** – Containerized environment
+- 🔐 **ConfigModule (.env based)** – Environment management
 
 ---
+
+## 📦 Features
+
+- Modular NestJS architecture
+- Dockerized development environment
+- PostgreSQL integration via TypeORM
+- Environment-based configuration (`local` / `production`)
+- External API integration (Job Data API)
+- Clean separation of config and database modules
+
+---
+
+## ⚙️ Project Structure
+
+- src/
+- features/ # Feature modules (jobs, etc.)
+- libs/ # Shared modules (database, config)
+- main.ts
+
+---
+
 
 ## 🔧 Getting Started
 
-### 🧪 Environment Variables
 
-Create a `.env` file with the following content:
+## 🔧 Environment Setup
+
+You should NOT create a `.env` file.
+
+Instead use:
+
+- `.env.local`
+- `.env.production`
+- `.env.example` (template only)
+
+---
+
+### 📄 Example `.env.local`
 
 ```env
-POSTGRES_USER=myuser
-POSTGRES_PASSWORD=mypassword
-POSTGRES_DB=lead_scout_db
-DB_HOST=db
+# App
+PORT=3000
+NODE_ENV=local
 
-JOBDATA_API_KEY = b94a335d-a565-4a95-8853-70346c64fec9
+# Database
+DB_HOST=your_db_host
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=job_scout_db
+
+JOBDATA_API_KEY=your_api_key_here
+
+DATABASE_URL=postgresql://postgres:postgres@your_db_host:5432/job_scout_db
+
+# External APIs
+JOBDATA_BASE_URL=https://jobdataapi.com/api/
+
 ```
+
+---
+
 
 ### Build & run with Docker
 
 ```bash
-$ docker compose up -d --build
+$ docker compose --env-file .env.local up -d --build
 ```
+
+---
 
 This will:
 1. start PostgreSQL,
@@ -74,7 +118,7 @@ When you're ready to deploy your NestJS application to production, there are som
 If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
 
 ```bash
-$ yarn install -g @nestjs/mau
+$ npm install -g @nestjs/mau
 $ mau deploy
 ```
 

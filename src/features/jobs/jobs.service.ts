@@ -18,7 +18,7 @@ import { countryMapper } from './mappers/country.mapper';
 
 @Injectable()
 export class JobsService {
-  private readonly BASE_URL = 'https://jobdataapi.com/api/';
+  private readonly BASE_URL = process.env.JOBDATA_BASE_URL;
 
   constructor(
     private readonly httpService: HttpService,

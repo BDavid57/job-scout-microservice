@@ -7,6 +7,7 @@ import { JobsModule } from './features/jobs/jobs.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, 
+      envFilePath: `.env.${process.env.NODE_ENV || 'local'}`,
     }),
 
     DatabaseModule,

@@ -5,11 +5,11 @@ export const getDatabaseConfig = (
   configService: ConfigService,
 ): TypeOrmModuleOptions => ({
   type: 'postgres',
-  host: configService.get<string>('DB_HOST', 'db'),
-  port: 5432,
-  username: configService.get<string>('POSTGRES_USER'),
-  password: configService.get<string>('POSTGRES_PASSWORD'),
-  database: configService.get<string>('POSTGRES_DB'),
+  host: configService.get<string>('DB_HOST'),
+  port: configService.get<number>('DB_PORT'),
+  username: configService.get<string>('DB_USERNAME'),
+  password: configService.get<string>('DB_PASSWORD'),
+  database: configService.get<string>('DB_NAME'),
   autoLoadEntities: true,
-  synchronize: true,
+  synchronize: configService.get<string>('NODE_ENV') !== 'production',
 });
