@@ -14,6 +14,11 @@ export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Get()
+  fetchAllJobs(@Query() query: JobsQueryDto) {
+    return this.jobsService.fetchFromApi(query);
+  }
+
+  @Get('saved')
   getJobs(@Query() query: JobsQueryDto) {
     return this.jobsService.findAll(query);
   }

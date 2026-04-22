@@ -12,6 +12,18 @@ export class JobsQueryDto {
 
   @IsOptional()
   @IsString()
+  region_id?: string;
+
+  @IsOptional()
+  @IsString()
+  max_age?: string;
+
+  @IsOptional()
+  @IsString()
+  language?: string;
+
+  @IsOptional()
+  @IsString()
   company_name?: string;
 
   @IsOptional()
