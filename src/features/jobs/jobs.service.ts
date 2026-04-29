@@ -9,11 +9,12 @@ import { Repository } from 'typeorm';
 import { firstValueFrom } from 'rxjs';
 
 import { Job } from './entities/job.entity';
-import { Company } from './entities/company.entity';
 import { JobsQueryDto } from './dto/jobs-query.dto';
 import { Region } from './entities/region.entity';
 import { Country } from './entities/country.entity';
 import { countryMapper } from './mappers/country.mapper';
+import { JobMapper } from './mappers/job.mapper';
+import { type SaveJobDto } from './dto/save-job.dto';
 
 @Injectable()
 export class JobsService {
@@ -31,6 +32,22 @@ export class JobsService {
     @InjectRepository(Country)
     private readonly countryRepo: Repository<Country>,
   ) {}
+
+  async saveJob(body: SaveJobDto) {
+    try {
+    const dto = JobMapper.fromApi(body);
+
+    const jobEntity = this.jobRepo.create(dto);
+
+    return await this.jobRepo.save(jobEntity);
+    } catch (error: any) {
+      console.log(error.response?.data?.detail);
+      throw new HttpException(
+        'Failed to save job',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   async syncCountries() {
   try {

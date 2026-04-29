@@ -5,9 +5,11 @@ import {
   Query,
   ParseIntPipe,
   Post,
+  Body,
 } from '@nestjs/common';
 import { JobsQueryDto } from './dto/jobs-query.dto';
 import { JobsService } from './jobs.service';
+import { type SaveJobDto } from './dto/save-job.dto';
 
 @Controller('jobs')
 export class JobsController {
@@ -16,6 +18,11 @@ export class JobsController {
   @Get()
   fetchAllJobs(@Query() query: JobsQueryDto) {
     return this.jobsService.fetchFromApi(query);
+  }
+
+  @Post()
+  saveJob(@Body() body: SaveJobDto) {
+    return this.jobsService.saveJob(body);
   }
 
   @Get('saved')
