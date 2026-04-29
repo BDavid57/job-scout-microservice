@@ -11,7 +11,6 @@ import { firstValueFrom } from 'rxjs';
 import { Job } from './entities/job.entity';
 import { Company } from './entities/company.entity';
 import { JobsQueryDto } from './dto/jobs-query.dto';
-import { JobMapper } from './mappers/job.mapper';
 import { Region } from './entities/region.entity';
 import { Country } from './entities/country.entity';
 import { countryMapper } from './mappers/country.mapper';
@@ -26,9 +25,6 @@ export class JobsService {
     @InjectRepository(Job)
     private readonly jobRepo: Repository<Job>,
 
-    @InjectRepository(Company)
-    private readonly companyRepo: Repository<Company>,
-
     @InjectRepository(Region)
     private readonly regionRepo: Repository<Region>,
 
@@ -37,72 +33,78 @@ export class JobsService {
   ) {}
 
   async syncCountries() {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(`${this.BASE_URL}jobcountries`, {
-          headers: {
-            Authorization: `Api-Key ${process.env.JOBDATA_API_KEY}`,
-          },
-        }),
-      );
+  try {
+    const response = await firstValueFrom(
+      this.httpService.get(`${this.BASE_URL}jobcountries`, {
+        headers: {
+          Authorization: `Api-Key ${process.env.JOBDATA_API_KEY}`,
+        },
+      }),
+    );
 
-      const list = response.data
+    const list = response.data;
 
-      for(const item of list) {
-        const mapped = countryMapper.fromApi(item)
+    const mappedList = list.map(countryMapper.fromApi);
 
-        let country = await this.regionRepo.findOne({
-          where: { name: mapped.name },
-        });
+    const existingCountries = await this.countryRepo.find({
+      where: mappedList.map((c) => ({ name: c.name })),
+    });
 
-        if(!country) {
-          const regionEntity = this.countryRepo.create(mapped);
-          await this.countryRepo.save(regionEntity);
-        }
-      }
+    const existingNames = new Set(existingCountries.map((c) => c.name));
 
-      return list;
-    } catch (error: any) {
-      console.log(error.response.data.detail)
-      throw new HttpException(
-        'Failed to fetch jobs from external API',
-        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    const newCountries = mappedList.filter(
+      (c) => !existingNames.has(c.name),
+    );
+
+    if (newCountries.length > 0) {
+      await this.countryRepo.save(newCountries);
     }
+
+    return list;
+  } catch (error: any) {
+    console.log(error.response?.data?.detail);
+    throw new HttpException(
+      'Failed to fetch countries',
+      error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
+}
 
-  async syncRegions() {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(`${this.BASE_URL}jobregions`, {
-          headers: {
-            Authorization: `Api-Key ${process.env.JOBDATA_API_KEY}`,
-          },
-        }),
-      );
+async syncRegions() {
+  try {
+    const response = await firstValueFrom(
+      this.httpService.get(`${this.BASE_URL}jobregions`, {
+        headers: {
+          Authorization: `Api-Key ${process.env.JOBDATA_API_KEY}`,
+        },
+      }),
+    );
 
-      const list = response.data
-      
-      for(const item of list) {
-        let region = await this.regionRepo.findOne({
-          where: { name: item.name },
-        });
+    const list = response.data;
 
-        if(!region) {
-          const regionEntity = this.regionRepo.create(item);
-          await this.regionRepo.save(regionEntity);
-        }
-      }
+    const existingRegions = await this.regionRepo.find({
+      where: list.map((r) => ({ name: r.name })),
+    });
 
-      return list;
-    } catch (error: any) {
-      console.log(error.response.data.detail)
-      throw new HttpException(
-        'Failed to fetch jobs from external API',
-        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    const existingNames = new Set(existingRegions.map((r) => r.name));
+
+    const newRegions = list.filter(
+      (r) => !existingNames.has(r.name),
+    );
+
+    if (newRegions.length > 0) {
+      await this.regionRepo.save(newRegions);
     }
+
+    return list;
+  } catch (error: any) {
+    console.log(error.response?.data?.detail);
+    throw new HttpException(
+      'Failed to fetch regions',
+      error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
+}
 
   async fetchFromApi(query: JobsQueryDto) {
     try {
@@ -127,47 +129,6 @@ export class JobsService {
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  async syncJobs(query: JobsQueryDto) {
-    const data = await this.fetchFromApi(query);
-
-    const list = data.results
-
-    for (const apiJob of list) {
-      const mapped = JobMapper.fromApi(apiJob);
-
-      let company = await this.companyRepo.findOne({
-        where: { name: mapped.company.name },
-      });
-
-      if (!company) {
-        company = this.companyRepo.create(mapped.company);
-        await this.companyRepo.save(company);
-      }
-
-      const existingJob = await this.jobRepo.findOne({
-        where: { id: mapped.id },
-      });
-
-      if (existingJob) {
-        await this.jobRepo.update(mapped.id, {
-          ...mapped,
-          company,
-        });
-      } else {
-        const jobEntity = this.jobRepo.create({
-          ...mapped,
-          company,
-        });
-        await this.jobRepo.save(jobEntity);
-      }
-    }
-
-    return {
-      message: 'Jobs synced successfully',
-      count: list.length,
-    };
   }
 
   async findAll(query: JobsQueryDto) {

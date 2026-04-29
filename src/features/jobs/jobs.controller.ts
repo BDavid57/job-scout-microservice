@@ -28,11 +28,6 @@ export class JobsController {
     return this.jobsService.findOne(id);
   }
 
-  @Post('sync')
-  syncJobs(@Query() query: JobsQueryDto) {
-    return this.jobsService.syncJobs(query);
-  }
-
   @Post('regions')
   syncRegions() {
     return this.jobsService.syncRegions()
