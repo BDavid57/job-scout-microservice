@@ -33,6 +33,22 @@ export class JobsService {
     private readonly countryRepo: Repository<Country>,
   ) {}
 
+  async deleteJob(id: number) {
+    try {
+      await this.findOne(id);
+
+      await this.jobRepo.delete(id);
+
+      return "Successfully deleted job!";
+    } catch (error: any) {
+      console.log(error.response?.data?.detail);
+      throw new HttpException(
+        'Failed to delete job',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async saveJob(body: SaveJobDto) {
     try {
     const dto = JobMapper.fromApi(body);

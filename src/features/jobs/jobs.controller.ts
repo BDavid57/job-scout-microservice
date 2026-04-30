@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   Body,
+  Delete,
 } from '@nestjs/common';
 import { JobsQueryDto } from './dto/jobs-query.dto';
 import { JobsService } from './jobs.service';
@@ -33,6 +34,11 @@ export class JobsController {
   @Get(':id')
   getJob(@Param('id', ParseIntPipe) id: number) {
     return this.jobsService.findOne(id);
+  }
+
+  @Delete(':id')
+  deleteJob(@Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.deleteJob(id);
   }
 
   @Post('regions')
