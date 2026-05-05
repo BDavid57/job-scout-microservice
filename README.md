@@ -63,13 +63,20 @@ A backend API built with **NestJS**, **TypeORM**, **PostgreSQL**, and **Docker**
 
 ## 🔧 Environment Setup
 
-You should NOT create a `.env` file.
+You should create a `.env` file.
 
-Instead use:
+Or use:
 
 - `.env.local`
 - `.env.production`
 - `.env.example` (template only)
+
+And if you do so, update docker-compose.yml as well to:
+
+```yml
+env_file:
+  - .env.local
+```
 
 ---
 
@@ -102,7 +109,11 @@ JOBDATA_BASE_URL=https://jobdataapi.com/api/
 ### Build & run with Docker
 
 ```bash
-$ docker compose --env-file .env.local up -d --build
+# for .env
+$ docker-compose up -d --build
+
+# for .env.local
+$ docker-compose --env-file .env.local up -d --build
 ```
 
 ---

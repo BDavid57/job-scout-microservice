@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -22,14 +24,10 @@ services:
       - "3000:3000"
     depends_on:
       - db
-    environment:
-      DB_HOST: db
-      CHOKIDAR_USEPOLLING: "true"
-    volumes:
-      - .:/app
-      - /app/node_modules
+    env_file:
+      - .env
     command: npm run start:dev
 
 volumes:
   postgres_data:
-  
+
